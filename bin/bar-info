@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+showglyph=false
+limitoutput=0
+pad=false
+
+while getopts ":hl:gp" opt; do
+    case $opt in
+        l)
+            # limit output to $OPTARG characters
+            limitoutput=$OPTARG
+            ;;
+        g)
+            # show a glyph in front of the output
+            showglyph=true
+            ;;
+        p)
+            # pad output with a space on either side
+            pad=true
+            ;;
+        :)
+            echo "Requires arguments."
+            exit 1
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+COMMAND=$1
+GLYPH=
+
+OUTPUT=""
+if [ "$COMMAND" = "time" ]; then
+    GLYPH=""
+    OUTPUT="$(date +%H:%M)"
+
+elif [ "$COMMAND" = "time-seconds" ]; then
+    GLYPH=""
+    OUTPUT="$(date '+%H:%M:%S')"
+
+elif [ "$COMMAND" = "date" ]; then
+    GLYPH=""
+    OUTPUT="$(date '+%a %d/%m/%Y')"
+
+elif [ "$COMMAND" = "volume" ]; then
+    GLYPH=""
+    OUTPUT="$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))"
+
+elif [ "$COMMAND" = "nowplaying" ]; then
+    if mpc -p 6601 2> /dev/null | grep playing > /dev/null 2>&1; then
+        GLYPH=""
+        OUTPUT="$(mpc -p 6601 -f '"%title%" by %artist%' current)"
+    elif mpc -p 6601 2> /dev/null | grep paused > /dev/null 2>&1; then
+        GLYPH=""
+        OUTPUT="$(mpc -p 6601 -f '"%title%" by %artist%' current)"
+    fi
+
+elif [ "$COMMAND" = "battery" ]; then
+    OUTPUT="$(upower -i $(upower -e | grep BAT) | grep percentage | awk '{print $2}' | tr -d "%")"
+    if [ "$showglyph" = true ]; then
+        if upower -i $(upower -e | grep BAT) | grep -P "state:\s*charging" > /dev/null; then
+            GLYPH=""
+        elif upower -i $(upower -e | grep BAT) | grep -P "state:\s*fully-charged" > /dev/null; then
+            GLYPH=""
+        elif [ "$OUTPUT" != "" ]; then
+            if [ "$OUTPUT" -lt 10 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 10 -a "$OUTPUT" -lt 20 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 20 -a "$OUTPUT" -lt 30 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 30 -a "$OUTPUT" -lt 40 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 40 -a "$OUTPUT" -lt 50 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 50 -a "$OUTPUT" -lt 60 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 60 -a "$OUTPUT" -lt 70 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 70 -a "$OUTPUT" -lt 80 ]; then GLYPH=""
+            elif [ "$OUTPUT" -ge 80 -a "$OUTPUT" -lt 90 ]; then GLYPH=""
+            else GLYPH=""; fi
+        fi
+    fi
+    if [ "$OUTPUT" != "" ]; then
+        OUTPUT="$OUTPUT%"
+    fi
+
+elif [ "$COMMAND" = "cpu" ]; then
+    GLYPH=""
+    OUTPUT="$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage "%"}' | sed 's/\..*%/%/')"
+
+elif [ "$COMMAND" = "memory" ]; then
+    GLYPH=""
+    OUTPUT="$(free | grep Mem | awk '{print int($3/$2 * 100.0) "%"}')"
+
+elif [ "$COMMAND" = "temp" ]; then
+    GLYPH=""
+    OUTPUT="$(sensors | grep -oP 'Package.*?\+\K[0-9.]+')c"
+
+elif [ "$COMMAND" = "mounted" ]; then
+    OUTPUT=$(lsblk -o LABEL,MOUNTPOINT | grep / | awk '$1 !~ /\// {print $1 ", "}')
+    OUTPUT=$(echo $OUTPUT | sed "s/,$//")
+    GLYPH=""
+
+elif [ "$COMMAND" = "wifi" ]; then
+    IWCONFIG=$(iwconfig 2> /dev/null| grep -o "ESSID:\".*\"")
+    if [ "$IWCONFIG" != "" ]; then
+        NETWORKNAME="$(echo $IWCONFIG | sed "s/ESSID:\"\(.*\)\"/\1/")"
+        if ping -c 1 -w 0.1 -W 0.1 8.8.8.8 > /dev/null; then
+            if [ "$showglyph" = true ]; then
+                OUTPUT="$NETWORKNAME"
+                GLYPH=""
+            else
+                OUTPUT="Connected to $NETWORKNAME"
+            fi
+        else
+            if [ "$showglyph" = true ]; then
+                OUTPUT="$NETWORKNAME"
+                GLYPH=""
+            else
+                OUTPUT="Connecting to $NETWORKNAME..."
+            fi
+        fi
+    else
+        if [ "$showglyph" != true ]; then
+            OUTPUT="Disconnected"
+        fi
+    fi
+fi
+
+# prepend the glyph if we're meant to show it
+if [ "$showglyph" = true ]; then
+    OUTPUT="$GLYPH $OUTPUT"
+fi
+
+# limit output if we're meant to
+if [ "$limitoutput" != "0" ] && [ "${#OUTPUT}" -gt "$limitoutput" ]; then
+    OUTPUT=$(echo $OUTPUT | cut -c1-$(($limitoutput-1)))...
+fi
+
+# echo output, with padding if we asked for it
+if [ "$OUTPUT" != "" ] && [ "$pad" = true ]; then
+    printf " %s " "$OUTPUT"
+else
+    echo $OUTPUT
+fi
+

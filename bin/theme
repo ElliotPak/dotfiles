@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+OPTION=$1
+
+TYPE=""
+
+if [ "$OPTION" = "swap" ]; then
+    # swap wallpaper's colours between different modes
+    WALLPAPER=$(cat $HOME/.cache/colours/wallpaper)
+    if cat $HOME/.cache/colours/type | grep "wal" >/dev/null; then
+        TYPE="mixed"
+    elif cat $HOME/.cache/colours/type | grep "mixed" >/dev/null; then
+        TYPE="default"
+    elif cat $HOME/.cache/colours/type | grep "default" >/dev/null; then
+        TYPE="wal"
+    fi
+    echo "New theme type is $TYPE"
+elif [ "$OPTION" = "resume" ]; then
+    # reload existing wallpaper/colours
+    WALLPAPER=$(cat $HOME/.cache/colours/wallpaper)
+    $HOME/bin/setup-wallpaper $WALLPAPER
+    TYPE=$(cat $HOME/.cache/colours/type)
+elif [ "$OPTION" = "random" ]; then
+    # load new wallpaper
+    WALLPAPER=$(find $HOME/Pictures/Wallpapers -type f | sort -R | head -n 1)
+    $HOME/bin/setup-wallpaper $WALLPAPER
+    TYPE=$(cat $HOME/.cache/colours/type)
+else
+    TYPE=$OPTION
+fi
+
+if [ "$TYPE" = "wal" ]; then
+    $HOME/bin/propogate-colours < $HOME/.cache/colours/colours-wal
+    echo $TYPE > $HOME/.cache/colours/type
+elif [ "$TYPE" = "mixed" ]; then
+    $HOME/bin/propogate-colours < $HOME/.cache/colours/colours-mixed
+    echo $TYPE > $HOME/.cache/colours/type
+elif [ "$TYPE" = "default" ]; then
+    $HOME/bin/propogate-colours < $HOME/.cache/colours/colours-default
+    echo $TYPE > $HOME/.cache/colours/type
+else
+    echo "Enter one of the following: random, default, wal, mixed, swap, resume"
+fi
+

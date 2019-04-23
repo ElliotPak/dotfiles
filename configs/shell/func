@@ -1,0 +1,223 @@
+# opens a note in ~/notes
+# creates a daily one if none are provided
+# NOTE: no longer used by me
+note() {
+	if [ $# -ne 0 ]; then
+        ext=${1: -3}
+        if [ $ext = ".md" ]; then
+            e ~/notes/$1
+        else
+            e ~/notes/$1.md
+        fi
+	else
+		e ~/notes/Daily/$(date +%Y.%m.%d).md
+	fi
+}
+
+# opens a note in ~/Dropbox/notes
+# creates a daily one if none are provided
+# NOTE: no longer used by me
+dnote() {
+	if [ $# -ne 0 ]; then
+        if [ ${1: -3} = ".md" ]; then
+            e ~/Dropbox/Notes/$1
+        else
+            e ~/Dropbox/Notes/$1.md
+        fi
+	else
+		e ~/Dropbox/Notes/Daily/$(date +%Y.%m.%d).md
+	fi
+}
+
+# opens a note in ~/Dropbox/notes
+# creates a daily one if none are provided
+# NOTE: no longer used by me
+journal() {
+    time=$(date "+%Y.%m.%d %H.%M")
+	e ~/Dropbox/Notes/Journals/${time}.md
+}
+
+# create a directory and immediately move into it
+mkcdir() {
+    mkdir $1 && cd $1
+}
+
+# taken from https://github.com/xvoland/Extract
+extract() {
+ if [ -z "$1" ]; then
+    # display usage if no parameters given
+    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
+ else
+    for n in $@
+    do
+      if [ -f "$n" ] ; then
+          case "${n%,}" in
+            *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar) 
+                         tar xvf "$n"       ;;
+            *.lzma)      unlzma ./"$n"      ;;
+            *.bz2)       bunzip2 ./"$n"     ;;
+            *.rar)       unrar x -ad ./"$n" ;;
+            *.gz)        gunzip ./"$n"      ;;
+            *.zip)       unzip ./"$n"       ;;
+            *.z)         uncompress ./"$n"  ;;
+            *.7z|*.arj|*.cab|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.rpm|*.udf|*.wim|*.xar)
+                         7z x ./"$n"        ;;
+            *.xz)        unxz ./"$n"        ;;
+            *.exe)       cabextract ./"$n"  ;;
+            *)
+                         echo "extract: '$n' - unknown archive method"
+                         return 1
+                         ;;
+          esac
+      else
+          echo "'$n' - file does not exist"
+          return 1
+      fi
+    done
+fi
+}
+
+# quiet version of which
+has-command () {
+    return $(which $1 > /dev/null 2>&1)
+}
+
+# determines whether a process is running, and what tmux sessions the
+# specified process runs in
+# succeeds if the process isn't running
+# returns 1 if its running in a tmux session
+# returns 2 if its running, but not in a tmux session
+process-runs-in() {
+    PROCESS=$1
+    PROCESSFIRST=$(echo $PROCESS | awk '{print $1}')
+    RUNSESSIONS=""      #sessions the process runs in
+    CURRENTPROCESSES=$(ps -ef)
+    if echo $CURRENTPROCESSES | grep $PROCESS > /dev/null; then
+        PIDS=$(ps -ef | grep "$PROCESS" | awk '$8 ~ /^'$PROCESSFIRST'/ { print $2; }')
+        for ii in $(tmux ls -F "#S"); do
+            # all first PIDs within the tmux session
+            for jj in $(tmux lsp -s -t $ii -F "#{pane_pid}"); do
+                for kk in $PIDS; do
+                    TREE=$(pstree -a -A -p $jj)
+                    if echo $TREE | grep "$kk" > /dev/null && [[ RUNSESSIONS != *"$ii"* ]]; then
+                        if [ "$RUNSESSIONS" != "" ]; then
+                            RUNSESSIONS="$RUNSESSIONS, $ii"
+                        else
+                            RUNSESSIONS="$ii"
+                        fi
+                    fi
+                done
+            done
+        done
+        if [ "$RUNSESSIONS" != "" ]; then
+            echo "\"$PROCESS\" is running in the following sessions: $RUNSESSIONS"
+            return 1
+        else
+            echo "\"$PROCESS\" is running but not in a tmux session."
+            return 2
+        fi
+    else
+        return 0
+    fi
+}
+
+# returns 0 if its safe to shutdown
+# will also handle certain things on shutdown, like pushing unpushed changes
+# to gitrepos
+shutdown-check() {
+	shuttingDown="no"
+    if process-runs-in vim; then shuttingDown="yes"; fi
+    if process-runs-in "emacsclient"; then shuttingDown="yes"; fi
+    if [ "$shuttingDown" != "yes" ]; then
+        echo yay
+        return 1
+    else
+        check-git-repo "https://gitlab.com/pakelli/notes.git" "$HOME/notes" auto nofetch
+        check-git-repo "https://gitlab.com/pakelli/organisation.git" "$HOME/organisation" auto nofetch
+        return 0
+    fi
+}
+
+# returns true if vim or emacsclient are running
+are-editors-running() {
+	shuttingDown="yes"
+	if pgrep vim > /dev/null; then
+		echo "Vim is still running!"
+		shuttingDown="no"
+	fi
+	if pgrep emacsclient > /dev/null; then
+		echo "Emacs client is still running!"
+		shuttingDown="no"
+	fi
+	if [ $shuttingDown = "yes" ]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+# change brightness from the terminal
+bright() {
+    if [ $# -lt 2 ]; then
+        echo "Usage: bright [operator] [amount]"
+        echo "Operator can +, -, ="
+        return 1
+    fi
+    current=$(cat /sys/class/backlight/intel_backlight/brightness)
+    if [ $1 = "+" ]; then
+        new=$(expr $current + $2)
+    elif [ $1 = "-" ]; then
+        new=$(expr $current - $2)
+    else
+        new=$2
+    fi
+    echo $new | sudo tee /sys/class/backlight/intel_backlight/brightness > /dev/null
+}
+
+# makes mpc load a soundcloud url and play it
+sc() {
+    mpc -p 6601 load soundcloud://url/soundcloud.com/$1
+    mpc -p 6601 play
+}
+
+# quick search specified directory, even if ag isnt installed
+qs() {
+    if has-command 'ag'; then
+        ag "$1" "$2"
+    else
+        find "$2" -not -path "*/\.*" -type f -exec grep "$1" {} +
+    fi
+}
+
+# quick search notes
+sn() {
+    qs $1 "$HOME/notes"
+}
+
+# quick search organisation
+snp() {
+    qs $1 "$HOME/organisation"
+}
+
+# start a tmux session in the specified folder if it doesnt exist,
+# or attach to it if it does
+tstart() {
+    if ! tmux has-session -t "$2"; then
+        tmux new -c "$1" -s "$2"
+    else
+        if [ "$TMUX" = "" ]; then
+            tmux att -t "$2"
+        else
+            cd "$1"
+        fi
+    fi
+}
+
+# determine the size of folders in the current directory
+# first parameter specified nesting level
+# e.g. foldersize 1 works for folders within current directory,
+#      foldersize 2 works for their subdirectories, etc
+foldersize() {
+    find -maxdepth $1 -mindepth $1 -type d | sed 's/^/"/g' | sed 's/$/"/g' | xargs -n 1 du -sh | sort -h
+}

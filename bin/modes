@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# this script doesnt work with firefox, so its basically useless.
+
+sites=( 'reddit.com' 'youtube.com' )
+file='/etc/hosts'
+
+fun() {
+    if grep "modes entries below" $file; then
+        sed --in-place "/## modes entries below/,/modes entries above/d" $file
+        echo "You're now in fun mode, but should you really be...?"
+    else
+        echo "You're already in fun mode, but should you really be...?"
+    fi
+}
+
+work() {
+    if ! grep "modes entries below" $file; then
+        echo -e "## modes entries below" >> $file
+        for site in ${sites[@]}; do
+            echo -e "127.0.0.1\t$site" >> $file
+            echo -e "127.0.0.1\twww.$site" >> $file
+        done
+        echo -e "## modes entries above" >> $file
+        echo "You're now in work mode. Get to it!"
+    else
+        echo "You're already in work mode. Get to it!"
+    fi
+}
+
+case $1 in
+    "fun")
+        fun; ;;
+    "work")
+        work; ;;
+    *)
+        echo "Please enter 'work' or 'fun'."
+        exit 1; ;;
+esac

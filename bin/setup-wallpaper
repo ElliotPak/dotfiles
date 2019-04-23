@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+WALLPAPER=$1
+
+wal -n -s -t -e -i "$WALLPAPER"
+echo $WALLPAPER > $HOME/.cache/colours/wallpaper
+convert "$WALLPAPER" -filter Gaussian -resize 25% \
+    -define filter:sigma=2.5 -resize "1920x1080^" "png:$HOME/.cache/colours/wallpaper-faded" &
+
+head -c -1 -q $HOME/.cache/wal/theme-colours $HOME/.cache/wal/theme-bw > $HOME/.cache/colours/colours-wal
+head -c -1 -q $HOME/.config/theme-colours $HOME/.config/theme-bw > $HOME/.cache/colours/colours-default
+head -c -1 -q $HOME/.cache/wal/theme-colours $HOME/.config/theme-bw > $HOME/.cache/colours/colours-mixed
+feh --bg-fill "$WALLPAPER"

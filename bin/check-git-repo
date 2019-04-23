@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# exit if wrong params
+if [[ $# -ne 4 ]]; then
+	echo Incorrect parameters.
+	echo Usage: $0 [git url] [repo path] [auto/noauto] [fetch/nofetch]
+	exit 1
+fi
+
+echo " --- Updating repo in $2..."
+
+# clone if it doesn't exist
+if [[ ! -d "$2" ]]; then
+	if ask-yes-no  " --- Repo doesn't exist. Clone it from $1? (y/n) "; then
+		git clone "$1" "$2"
+	fi
+else
+	for branch in $(git -C "$2" for-each-ref --format='%(refname:short)' refs/heads/); do
+		check-git-branch "$2" "$branch" "$3" "$4"
+	done
+fi
+

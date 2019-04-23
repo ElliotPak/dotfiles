@@ -1,0 +1,160 @@
+# set variables
+set $mod Mod4
+set $ws01 "1"
+set $ws02 "2"
+set $ws03 "3"
+set $ws04 "4"
+set $ws05 "5"
+set $ws06 "6"
+set $ws07 "7"
+set $ws08 "8"
+set $ws09 "9"
+set $ws10 "10"
+
+set_from_resource $black i3wm.color0 #111111
+set_from_resource $black-alt i3wm.color8 #222222
+set_from_resource $white i3wm.color8 #eeeeee
+set_from_resource $white-alt i3wm.color8 #dddddd
+set_from_resource $red i3wm.color8 #ff006f
+
+# Font for window titles. Will also be used by the bar unless a different font
+# is used in the bar {} block below.
+font pango:monospace 12
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window a lot
+bindsym $mod+Shift+h move left 50 px
+bindsym $mod+Shift+j move down 50 px
+bindsym $mod+Shift+k move up 50 px
+bindsym $mod+Shift+l move right 50 px
+bindsym $mod+Shift+Left move left 50 px
+bindsym $mod+Shift+Down move down 50 px
+bindsym $mod+Shift+Up move up 50 px
+bindsym $mod+Shift+Right move right 50 px
+
+# resize windows
+bindsym $mod+Ctrl+y resize shrink width 50 px
+bindsym $mod+Ctrl+u resize shrink height 50 px
+bindsym $mod+Ctrl+i resize grow height 50 px
+bindsym $mod+Ctrl+o resize grow width 50 px
+
+# move workspace to other outputs
+bindsym $mod+Shift+greater move workspace to output right
+bindsym $mod+Shift+less move workspace to output left
+
+# split in horizontal/vertical orientation
+bindsym $mod+comma split h
+bindsym $mod+period split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+t layout tabbed
+bindsym $mod+slash layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# switch to workspace
+bindsym $mod+1 workspace $ws01
+bindsym $mod+2 workspace $ws02
+bindsym $mod+3 workspace $ws03
+bindsym $mod+4 workspace $ws04
+bindsym $mod+5 workspace $ws05
+bindsym $mod+6 workspace $ws06
+bindsym $mod+7 workspace $ws07
+bindsym $mod+8 workspace $ws08
+bindsym $mod+9 workspace $ws09
+bindsym $mod+0 workspace $ws10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws01
+bindsym $mod+Shift+2 move container to workspace $ws02
+bindsym $mod+Shift+3 move container to workspace $ws03
+bindsym $mod+Shift+4 move container to workspace $ws04
+bindsym $mod+Shift+5 move container to workspace $ws05
+bindsym $mod+Shift+6 move container to workspace $ws06
+bindsym $mod+Shift+7 move container to workspace $ws07
+bindsym $mod+Shift+8 move container to workspace $ws08
+bindsym $mod+Shift+9 move container to workspace $ws09
+bindsym $mod+Shift+0 move container to workspace $ws10
+
+# gaps-related bindings
+bindsym $mod+g gaps inner current set 15; gaps outer current set 15
+bindsym $mod+Shift+g gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z gaps inner current minus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+bindsym $mod+x gaps inner current plus 5
+bindsym $mod+Shift+x gaps outer current plus 5
+
+# reload the configuration file
+bindsym $mod+r reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# window colors
+# colour category       border      background  text        indicator
+client.focused          $white      $white      $black      $black-alt
+client.unfocused        $white-alt  $white-alt  $black      $black
+client.focused_inactive $white-alt  $white-alt  $black-alt  $black
+client.urgent           $red        $red        $white      $red
+
+default_border pixel 2
+hide_edge_borders both
+
+# Do i3-gaps things
+gaps inner 15
+gaps outer 15
+smart_borders no_gaps
+
+# Media player controls
+
+# Assign programs to workspaces
+assign [class="^Emacs24$"] $ws03
+assign [class="^dolphin$"] $ws04
+assign [class="^Franz$"] $ws10
+assign [class="^vlc$"] $ws10
+
+# Make certain windows floating
+for_window [class="^Gdebi\-gtk$"] floating enable
+for_window [title="launcher"] floating enable, resize shrink height 100px, move position center, move scratchpad
+
+# various sizes of floating terminal windows
+for_window [title="floatterm_small"] floating enable, resize shrink height 100px, move position center
+for_window [title="floatterm"] floating enable, move position center
+for_window [title="floatterm_medium"] floating enable, resize grow height 100px, resize grow width 200px, move position center
+for_window [title="floatterm_large"] floating enable, resize grow height 200px, resize grow width 400px, move position center
+for_window [title="floatterm_huge"] floating enable, resize grow height 400px, resize grow width 800px, move position center
+
+# do my startup stuff
+exec --no-startup-id . /home/elliot/dotfiles/bin/startup
+
+# do monitor things
+exec --no-startup-id . /home/elliot/dotfiles/bin/i3-monitor
+
+# Start things in specific workspaces
+exec i3-msg "workspace $ws01; exec /usr/local/bin/termite"
+exec i3-msg "workspace $ws01; exec /usr/local/bin/termite -e /home/elliot/dotfiles/bin/startup-fg"
+exec i3-msg "workspace $ws02; exec /usr/bin/firefox"
+
+exec --no-startup-id i3-msg "workspace $ws01;"

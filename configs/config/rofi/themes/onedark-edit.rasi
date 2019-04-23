@@ -1,0 +1,98 @@
+/*
+ * ROFI One Dark
+ *
+ * Based on OneDark.vim (https://github.com/joshdick/onedark.vim)
+ *
+ * Author: Benjamin Stauss
+ * User: swelliot
+ *
+ */
+
+
+* {
+  black:      #111111;
+  red:        #ff006f;
+  green:      #00ffdf;
+  yellow:     #ff00df;
+  blue:       #3563ff;
+  mangenta:   #9b00ff;
+  cyan:       #00d7ff;
+  white:       #eeeeee;
+  black-2:    #222222;
+  white-2:    #dddddd;
+
+  spacing: 0;
+  background-color: transparent;
+
+  font: "Iosevka Term SS06 Regular 14";
+  text-color: @white;
+}
+
+window {
+  transparency: "real";
+  fullscreen: true;
+  background-color: #000000E0;
+}
+
+mainbox {
+  padding: 30% 30%;
+}
+
+inputbar {
+  margin: 0px 0px 20px 0px;
+  children: [prompt, textbox-prompt-colon, entry, case-indicator];
+}
+
+prompt {
+  text-color: @cyan;
+}
+
+textbox-prompt-colon {
+  expand: false;
+  str: ":";
+  text-color: @cyan;
+}
+
+entry {
+  margin: 0px 10px;
+}
+
+listview {
+  spacing: 5px;
+  dynamic: true;
+  scrollbar: false;
+}
+
+element {
+  padding: 5px;
+  text-color: @white-2;
+  highlight: bold #00d7ff;
+  border-radius: 3px;
+}
+
+element selected {
+  background-color: @black-2;
+  text-color: @white;
+}
+
+element urgent, element selected urgent {
+  text-color: @red;
+}
+
+element active, element selected active {
+  text-color: @green;
+}
+
+message {
+  padding: 5px;
+  border-radius: 3px;
+  background-color: @black-2;
+  border: 1px;
+  border-color: @cyan;
+}
+
+button selected {
+  padding: 5px;
+  border-radius: 3px;
+  background-color: @black-2;
+}

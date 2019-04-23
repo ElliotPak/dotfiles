@@ -1,0 +1,80 @@
+# misc aliases
+alias grp='grep -nE'
+alias mkdir="mkdir -p"
+alias cd..="cd .."              #typo
+alias gim='gvim'                #typo
+alias :w="echo This isn\'t vim!"
+alias :q!='exit'
+alias clipp='xclip -selection clipboard -o'
+alias emacsd='emacs --daemon'
+alias emacsc='emacsclient'
+alias emacscg='emacsclient -c -a emacs &'
+alias st='source ~/bin/startup'
+alias stfg='source ~/bin/startup-fg'
+alias clipboard='xclip -selection clipboard'
+alias vlchere='find -type f -name "*.mp3" -exec vlc {} + &'
+alias pcsleep='i3lock && systemctl suspend'
+alias pcshutdown='! are-editors-running && shutdown now'
+alias pcreboot='! are-editors-running && shutdown -r now'
+alias i3logout='! are-editors-running && i3-msg exit'
+
+# used to start tmux sessions in specific folders
+# see .shell/func for a definition of tstart
+alias n='tstart ~/notes notes'
+alias org='tstart ~/organisation organisation'
+alias dot='tstart ~/dotfiles dot'
+
+# editing (and sourcing) configs
+alias vimrc='e ~/.vimrc'
+alias bashrc='e ~/.bashrc'
+alias zshrc='e ~/.zshrc'
+alias tmuxconf='e ~/.tmux.conf'
+alias aliases='e ~/.shell/aliases'
+alias dotenv='e ~/.shell/env'
+alias func='e ~/.shell/func'
+alias displayrc-'e ~/.shell/displayrc'
+alias i3config='e ~/.config/i3/config'
+alias termiteconfig='e ~/.config/termite/config'
+alias sxhkdrc='e ~/.config/sxhkd/sxhkdrc'
+alias sbashrc="source ~/.bashrc"
+alias szshrc='source ~/.zshrc'
+
+# open a scratchpad
+alias scratch='e ~/.scratch'
+
+# git aliases
+alias ga="git add"
+alias gb="git branch"
+alias gc="git commit"
+alias gco="git checkout"
+alias gd="git diff"
+alias gdca="git diff --cached"
+alias gf="git fetch"
+alias gst="git status"
+alias gl="git log"
+alias grh="git reset HEAD"
+
+# tmux aliases
+alias t="tmux"
+alias tns="tmux new -s"
+alias tat="tmux att -t"
+alias td="tmux det"
+alias tl="tmux ls"
+
+# apt-get aliases
+alias sag="sudo apt-get"
+alias sagi="sudo apt-get install"
+alias sagifb="sudo apt-get --fix-broken install"
+alias sagupd="sudo apt-get update"
+alias sagupg="sudo apt-get upgrade"
+alias acs="apt-cache search"
+
+# zsh global aliases
+if alias -g TEST="| echo test" > /dev/null 2>&1; then
+    unalias "TEST"
+    alias -g CP='| xclip -selection clipboard'
+fi
+
+# editor and visual editor aliases
+alias e=$EDITOR
+alias v=$VISUAL

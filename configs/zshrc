@@ -1,0 +1,63 @@
+# set up pywal colours if they exist
+if [ -n "$DISPLAY" ]; then
+    [ -f "$HOME/.cache/colours/sequences" ] && cat $HOME/.cache/colours/sequences
+fi
+
+# make completion case insensitive and not just from the starting word
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# set history file
+HISTFILE=~/.zsh_history
+SAVEHIST=10000
+HISTSIZE=50000
+setopt extended_history
+setopt hist_ignore_dups
+setopt hist_ignore_space
+setopt hist_expire_dups_first
+setopt hist_verify
+setopt inc_append_history
+setopt share_history
+
+#stop phantom characters
+export LC_ALL="en_US.UTF-8"
+
+source-if-exists() {
+    [ -f "$1" ] && source $1
+}
+
+source-if-exists ~/.shell/env
+source-if-exists ~/.shell/aliases
+source-if-exists ~/.shell/func
+source-if-exists ~/.shell/displayrc
+source-if-exists ~/.shell/localrc
+
+source-if-exists ~/.fzf.zsh
+
+if [ -f ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source ~/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=1'
+    ZSH_HIGHLIGHT_STYLES[command]='fg=6'
+    ZSH_HIGHLIGHT_STYLES[arg0]='fg=6'
+    ZSH_HIGHLIGHT_STYLES[precommand]='fg=6'
+    ZSH_HIGHLIGHT_STYLES[suffix-alias]='fg=6'
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=2'
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=2'
+    ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]='fg=2'
+fi
+
+source-if-exists ~/.shell/prompt
+
+if has-command fzf && has-command ag; then
+    export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+    export FZF_DEFAULT_OPTS='--color=16'
+fi
+
+# keybinds
+
+addTmuxText() {
+    LBUFFER="tat "${LBUFFER}
+    zle expand-or-complete
+}
+
+zle -N addTmuxText
+bindkey '^B' addTmuxText

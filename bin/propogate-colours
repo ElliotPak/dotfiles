@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+
+#read in colours
+read COLOUR1 COLOUR2 COLOUR3 COLOUR4 COLOUR5 COLOUR6 COLOUR9 COLOUR10 COLOUR11 COLOUR12 COLOUR13 COLOUR14 COLOUR0 COLOUR7 COLOUR8 COLOUR15 BG FG
+
+# create cahce dir if it doesnt exist
+[ -d "$HOME/.cache/colours" ] || mkdir -p $HOME/.cache/colours
+
+# send colours to all terminals
+send_to_pts() {
+    for file in /dev/pts/[0-9]*; do
+        printf $1 > $file
+    done
+}
+
+mv $HOME/.cache/colours/colors.Xresources $HOME/.cache/colours/colors.Xresources.old
+printf "" > $HOME/.cache/colours/colors.Xresources
+printf "" > $HOME/.cache/colours/sequences
+
+for ii in $(seq 0 15); do
+    eval "thiscolour=\$COLOUR$ii"
+
+    #send to current terminals and sequences file
+    send_to_pts "\033]4;$ii;$thiscolour\033\\"
+    printf "\033]4;$ii;$thiscolour\033\\" >> $HOME/.cache/colours/sequences
+
+    #send to xrdb
+    printf "*.color$ii:  $thiscolour\n*color$ii:   $thiscolour\n" >> $HOME/.cache/colours/colors.Xresources
+done
+
+printf "\n*.foreground:  $FG\n*foreground:   $FG\n" >> $HOME/.cache/colours/colors.Xresources
+printf "*.background:  $BG\n*background:   $BG\n" >> $HOME/.cache/colours/colors.Xresources
+send_to_pts "\033]11;$BG\033\\"
+printf "\033]11;$BG\033\\" >> $HOME/.cache/colours/sequences
+send_to_pts "\033]10;$FG\033\\"
+printf "\033]10;$FG\033\\" >> $HOME/.cache/colours/sequences
+
+# reload stuff if Xresources has changed
+if ! cmp --silent $HOME/.cache/colours/colors.Xresources $HOME/.cache/colours/colors.Xresources.old; then
+    xrdb -merge -quiet $HOME/.cache/colours/colors.Xresources
+    i3-msg reload
+    pkill -USR1 polybar
+fi
+
+rm $HOME/.cache/colours/colors.Xresources.old

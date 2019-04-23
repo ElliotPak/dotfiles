@@ -1,0 +1,300 @@
+;=====================================================
+;
+;   To learn more about how to configure Polybar
+;   go to https://github.com/jaagr/polybar
+;
+;   The README contains alot of information
+;
+;=====================================================
+
+;;;
+
+[colors]
+black = ${xrdb:color0:#111111}
+black-alt = ${xrdb:color8:#222222}
+white = ${xrdb:color15:#eeeeee}
+white-alt = ${xrdb:color7:#dddddd}
+red = ${xrdb:color1:#ff006f}
+bg-transparent = #000000F0
+
+;;;
+
+[global/wm]
+margin-top = 5
+margin-bottom = 5
+
+;;;
+
+[bar/gap]
+width = 100%
+height = 15
+background = ${colors.bg-transparent}
+modules-center = nothing
+
+;;;
+
+[bar/main]
+width = 100%
+height = 32
+radius = 0.0
+offset-x = 0
+offset-y = 0
+fixed-center = true
+
+background = ${colors.black}
+foreground = ${colors.white}
+
+padding-right = 1
+
+;font-0 = Iosevka Term SS06:pixelsize=14;2
+;font-1 = Iosevka Term SS06:pixelsize=16;2
+font-0 = Overpass:pixelsize=12;2
+font-1 = Overpass:pixelsize=14;2
+font-2 = Overpass Mono:pixelsize=12;2
+font-3 = Siji:pixelsize=10;2
+
+modules-left = i3 
+modules-center = 
+modules-right = music volume battery date time
+
+;;;
+
+[bar/main-border]
+width = 100%
+height = 32
+radius = 0.0
+offset-x = 0
+offset-y = 0
+fixed-center = true
+
+background = ${colors.bg-transparent}
+foreground = ${colors.white}
+
+padding-right = 1
+
+;font-0 = Iosevka Term SS06:pixelsize=12;2
+;font-1 = Iosevka Term SS06:pixelsize=14;2
+font-0 = Overpass:pixelsize=12;2
+font-1 = Overpass:pixelsize=14;2
+font-2 = SF Pro Display:style=semibold:antialias=true:pixelsize=12;2
+font-3 = Siji:pixelsize=10;2
+
+border-left-size = 15
+border-right-size = 15
+border-top-size = 15
+border-color = ${colors.bg-transparent}
+
+modules-left = i3
+modules-right = music volume battery date
+
+;;;
+
+[bar/extra]
+width = 100%
+height = 22
+ardius = 0.0
+offset-x = 0
+offset-y = 0
+fixed-center = true
+
+background = ${colors.black}
+foreground = ${colors.white}
+
+padding-right = 1
+module-margin = 1
+
+;font-0 = Iosevka Term SS06:pixelsize=10;1
+font-0 = Overpass:pixelsize=10;1
+font-1 = SF Pro Display:style=semibold:antialias=true:pixelsize=12;2
+font-2 = Siji:pixelsize=10;2
+
+bottom = true
+
+modules-left = 
+modules-center = 
+modules-right = xkeyboard filesystem eth wifi temperature weather memory cpu tray
+
+tray-position = right
+tray-padding = 2
+
+;;;
+
+[bar/main1]
+inherit = bar/main
+monitor = ${env:MONITOR:HDMI-1}
+
+;;;
+
+[bar/main2]
+inherit = bar/main
+monitor = ${env:MONITOR:DVI-D-1}
+
+;;;
+
+[bar/extra1]
+inherit = bar/extra
+monitor = ${env:MONITOR:HDMI-1}
+
+;;;
+
+[bar/extra2]
+inherit = bar/extra
+monitor = ${env:MONITOR:DVI-D-1}
+
+;;;
+
+[module/scriptbase]
+type = custom/script
+exec = ~/bin/bar-info -g -p -l 50 time
+interval = 1
+label = %output%
+label-background = ${colors.black}
+label-foreground = ${colors.white}
+
+;;;
+
+[module/music]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 nowplaying
+
+;;;
+
+[module/date]
+inherit = module/scriptbase
+interval = 60
+exec = ~/bin/bar-info -g -p -l 50 date
+
+;;;
+
+[module/time]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 time-seconds
+label = %output%
+label-font = 3
+
+;;;
+
+[module/volume]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 volume
+
+;;;
+
+[module/battery]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 battery
+
+;;;
+
+[module/filesystem]
+inherit = module/scriptbase
+interval = 15
+exec = ~/bin/bar-info -g -p -l 50 mounted
+
+;;;
+
+[module/cpu]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 cpu
+
+;;;
+
+[module/memory]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 memory
+
+;;;
+
+[module/temperature]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 temp
+
+;;;
+
+[module/wifi]
+inherit = module/scriptbase
+exec = ~/bin/bar-info -g -p -l 50 wifi
+
+;;;
+
+[module/nothing]
+inherit = module/scriptbase
+exec = echo ""
+
+;;;
+
+[module/xwindow]
+type = internal/xwindow
+label = " %title:0:60:...% "
+format-background = ${colors.black}
+format-foreground = ${colors.white}
+
+;;;
+
+[module/i3]
+type = internal/i3
+format = <label-state> <label-mode>
+index-sort = true
+wrapping-scroll = false
+pin-workspaces = true
+
+label-mode-padding = 1
+label-mode-foreground = ${colors.white}
+label-mode-background = ${colors.black-alt}
+
+label-focused = %index%
+label-focused-foreground = ${colors.black}
+label-focused-background = ${colors.white-alt}
+label-focused-underline = ${colors.white-alt}
+label-focused-padding = 1
+label-focused-font = 2
+
+label-unfocused = %index%
+label-unfocused-background = ${colors.black}
+label-unfocused-foreground = ${colors.white-alt}
+label-unfocused-padding = 1
+label-unfocused-font = 2
+
+label-urgent = %index%!
+label-urgent-background = ${colors.red}
+label-urgent-padding = 1
+label-urgent-font = 2
+
+label-visible = %index%
+label-visible-background = ${colors.black}
+label-visible-underline = ${colors.black}
+label-visible-padding = 1
+label-visible-font = 2
+
+;;;
+
+[module/powermenu]
+type = custom/menu
+
+format-spacing = 1
+
+label-open =  power
+label-open-foreground = ${colors.white}
+label-close =  cancel
+label-close-foreground = ${colors.white}
+label-separator = |
+label-separator-foreground = ${colors.white-alt}
+
+menu-0-0 = reboot
+menu-0-0-exec = menu-open-1
+menu-0-1 = power off
+menu-0-1-exec = menu-open-2
+
+menu-1-0 = cancel
+menu-1-0-exec = menu-open-0
+menu-1-1 = reboot
+menu-1-1-exec = sudo reboot
+
+menu-2-0 = power off
+menu-2-0-exec = sudo poweroff
+menu-2-1 = cancel
+menu-2-1-exec = menu-open-0
+
+;;;
+
+; vim:ft=dosini

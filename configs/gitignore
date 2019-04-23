@@ -1,0 +1,30 @@
+### Compiled files
+*.exe
+*.o
+*.class
+*.dll
+*.apk
+*.ap_
+
+### Temporary files
+*.swp
+*.swo
+*~
+
+### Compressed files
+*.7z
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+### OS-generated files
+.DS_Store*
+Thumbs.db
+.directory
+
+### Folders etc.
+build/
+.gradle

@@ -1,0 +1,44 @@
+shellname=$(ps -p$$ -ocmd=)
+
+__prompt_errorcode() {
+    if [ $? -ne 0 ]; then
+        echo "[!] "
+    fi
+}
+
+__c() {
+    colour=""
+    if [[ $1 -ge 0 ]] && [[ $1 -lt 8 ]]; then
+        colour=$(( 30 + $1 ))
+    elif [[ $1 -ge 8 ]] && [[ $1 -lt 16 ]]; then
+        colour=$(( $1 - 8))
+        colour=$(( $colour + 90 ))
+    fi
+    echo -e "\e[${colour}m"
+}
+
+if [ ! -f $HOME/.git-prompt.sh ]; then
+    echo "--- Downloading git prompt script... ---"n
+    wget -O ~/.git-prompt.sh "https://github.com/git/git/raw/master/contrib/completion/git-prompt.sh"
+fi
+source ~/.git-prompt.sh
+
+if [[ "$shellname" =~ .*zsh ]]; then
+    setopt PROMPT_SUBST
+    export PS1=$'\n┌─── $(__prompt_errorcode "%s")%{$(__c 6 "%s")%}[%~]%{$(__c 13 "%s")%}$(__git_ps1 " (%s)") %{$(__c 1 "%s")%}[%n@%m]\n%{$(__c 7 "%s")%}└─> '
+elif [[ "$shellname" =~ .*bash ]]; then
+    export PS1="\n$(__prompt_errorcode)$(__c 1) {\w}$(__c 13)$(__git_ps1) $(__c 6){\u@\h}\n$(__c 7)$ "
+fi
+
+# Startup message
+echo ""
+echo "    $(__c 1)Shell: $(__c 9)$shellname"
+echo "    $(__c 2)Kernel: $(__c 10)$(uname -r)"
+echo "    $(__c 3)User: $(__c 11)$USER"
+if [[ "$shellname" =~ .*zsh ]]; then
+    echo "    $(__c 4)Hostname: $(__c 12)$HOST"
+elif [[ "$shellname" =~ .*bash ]]; then
+    echo "    $(__c 4)Hostname: $(__c 12)$HOSTNAME"
+fi
+echo "    $(__c 5)Uptime: $(__c 13)$(uptime -p)"
+echo "    $(__c 6)Date: $(__c 14)$(date +"%H.%M %d.%m.%Y")"

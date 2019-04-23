@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# env stuff
+if ! type pathadd > /dev/null 2>&1; then
+	source $HOME/.shell/env
+fi
+
+# background
+theme resume
+
+# daemons
+nm-applet & disown
+compton -b & disown
+emacs --daemon & disown
+mpd & disown
+dunst & disown
+sxhkd & disown
+mpd-notify & disown
+franz & disown

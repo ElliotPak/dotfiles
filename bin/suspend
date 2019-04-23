@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+case $1 in
+    post)
+        source /home/elliot/.displayrc
+        ;;
+esac

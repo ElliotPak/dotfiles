@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# env stuff
+if ! type pathadd > /dev/null 2>&1; then
+	. $HOME/.shell/env
+fi
+
+TOSEND="CPU: $(bar-info cpu)"
+TOSEND="$TOSEND\nMemory: $(bar-info memory)"
+TOSEND="$TOSEND\nTemperature: $(bar-info temp)"
+TOSEND="$TOSEND\nMounted drives: $(bar-info mounted)"
+TOSEND="$TOSEND\nWifi: $(bar-info wifi)"
+
+notify-send "System Info" "$TOSEND"

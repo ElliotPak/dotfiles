@@ -1,0 +1,56 @@
+set font                        "Iosevka 11"
+set default-bg                  "#111111"
+set default-fg                  "#eeeeee"
+
+set statusbar-bg                "#111111"
+set statusbar-fg                "#eeeeee"
+
+set inputbar-bg                 "#111111"
+set inputbar-fg                 "#eeeeee"
+
+set notification-error-bg       "#ff006f"
+set notification-error-fg       "#111111"
+
+set notification-warning-bg     "#ff75b1"
+set notification-warning-fg     "#111111"
+
+set highlight-color             "#88d7ff"
+set highlight-active-color      "#00d7ff"
+
+set completion-highlight-bg     "#222222"
+set completion-highlight-fg     "#ff006f"
+
+set completion-bg               "#111111"
+set completion-fg               "#eeeeee"
+
+set notification-bg             "#111111"
+set notification-fg             "#eeeeee"
+
+set recolor-lightcolor          "#111111"
+set recolor-darkcolor           "#eeeeee"
+set recolor                     "true"
+
+# Setting recolor-keep true will keep any color your pdf has.
+# If it is false, it'll just be black and white.
+set recolor-keephue             "false"
+
+# Rest of your configs go here:
+
+set adjust-open width
+set pages-per-row 1
+set smooth-scroll true
+set selection-clipboard clipboard
+set guioptions ""
+
+set window-title-home-tilde true
+set window-title-basename true
+set statusbar-home-tilde true
+set show-hidden true
+
+map d scroll half-down
+map u scroll half-up
+map x toggle_page_mode
+map <C-r> rotate
+map r recolor
+map <S-Up> zoom in
+map <S-Down> zoom out

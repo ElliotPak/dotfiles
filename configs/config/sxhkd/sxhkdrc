@@ -1,0 +1,85 @@
+# launch termite
+super + Return
+    termite
+
+# terminal-based launcher
+super + d
+    termite -t "launcher" -e "launcher run fzf"
+
+# launch one command anywhere
+super + shift + d
+    termite -t "launcher" -e "launcher run single-command"
+
+# rofi
+super + ctrl + shift + d
+    rofi -show run
+
+# Pulse Audio controls
+{XF86AudioRaiseVolume,XF86AudioLowerVolume}
+    amixer -q sset Master 5%{+,-}
+
+super + {minus,equal}
+    amixer -q sset Master 5%{-,+}
+
+# change song
+{XF86AudioNext,XF86AudioPrev}
+    mpc -p 6601 {next,prev}
+super + {bracketleft,bracketright}
+    mpc -p 6601 {prev,next}
+super + {braceleft, braceright}
+    mpc -p 6601 seek {-,+}00:00:05
+
+XF86AudioPlay
+    mpc -p 6601 toggle
+XF86AudioPause
+    mpc -p 6601 toggle
+super + p
+    mpc -p 6601 toggle
+
+### Open Terminals/Programs
+
+# open ncmpcpp
+super + m
+    termite -t "floatterm_huge" -e "bash -c 'source ~/.bashrc & ncmpcpp'"
+
+# display now playing
+super + shift + m
+    mpd-notify current
+
+# screenshot entire screen
+super + ctrl + s
+    scrot $HOME/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png
+
+# screenshot specific section
+super + shift + s
+    scrot -s $HOME/Pictures/screenshots/$(date +%Y-%m-%d-%H-%M-%S).png
+
+# open firefox
+super + w
+    firefox
+
+# open file browser
+super + e
+    pcmanfm
+
+### Bin-based Bindings
+
+# lock screen
+super + ctrl + l
+    lock
+
+# cycle bars
+super + b
+    cycle-bar
+
+# get system information
+super + shift + i
+    sys-info
+
+# change to random wallpaper/scheme
+super + shift + w
+    theme random
+
+# change between wallpaper/scheme modes
+super + ctrl + w
+    theme swap

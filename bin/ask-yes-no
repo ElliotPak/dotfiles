@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 0 ]]; then
+	read -p "$1" choice < /dev/tty
+else
+	read -p "" choice < /dev/tty
+fi
+
+until [[ $choice == [YyNn] ]]; do
+	read -p "Please enter y or n: " choice
+done
+
+case $choice in
+	[Yy]) exit 0 ;;
+	[Nn]) exit 1 ;;
+	*) exit 2 ;; #shouldn't be reached but whatever, lets count it as a no
+esac

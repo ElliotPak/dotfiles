@@ -1,0 +1,213 @@
+set smartindent
+set expandtab                   " 4 spaces or GO HOME "
+set shiftwidth=4
+set tabstop=4
+
+set number                      " line numbers "
+" set relativenumber              " relative line numbers (disabled because it's slow)"
+set scrolloff=5                 " 5 lines when scrolling up/down "
+set sidescrolloff=20            " 10 lines when scrolling left/right "
+set list                        " show whitespace "
+set listchars=tab:.-,trail:-
+set mouse=a
+if !has('nvim')
+    set ttymouse=xterm2
+endif
+
+set history=500
+set hlsearch                    " highlight search results "
+set ignorecase smartcase        " search queries intelligently set case "
+set incsearch                   " show search results as you type "
+set splitright                  " open new windows to the right "
+set splitbelow                  " open new windows to the down...? "
+set lazyredraw                  " reduces redraw frequency "
+set ttyfast                     " send more characters in fast terminals "
+set wildmenu                    " show completion suggestions in menu "
+
+set undodir=~/.vim/undo         " persistent undo, yo "
+set undofile
+set undolevels=1000
+set undoreload=10000
+
+" swaps between prose mode and not "
+let g:prosemode_enabled = 0
+function! ProseMode()
+    if g:prosemode_enabled == 0
+        let g:prosemode_enabled = 1
+        Goyo 81
+        Limelight0.5
+        set spell
+        set complete+=s
+        set tw=80
+    else
+        let g:prosemode_enabled = 1
+        Goyo!
+        Limelight!
+        source $MYVIMRC
+    endif
+endfunction
+
+function! WrapMDHardToSoft()
+    " Save cursor pos "
+    let l:save = winsaveview()
+    " Merge non-punctuated lines "
+    %s/\(\S\)\n\([A-Za-z0-9]\)/\1 \2/g
+    " Properly merge indentation "
+    %s/\(\S\)\n[ \t][ \t]*/\1 /g
+    " Reset cursor pos "
+    call winrestview(l:save)
+endfunction
+
+function! WrapMDSoftToHard()
+endfunction
+
+command! ProseMode call ProseMode()
+command! WrapMDHardToSoft call WrapMDHardToSoft()
+command! WrapMDSoftToHard call WrapMDSoftToHard()
+
+let mapleader="\<space>"
+
+" for quick opening and closing of buffers "
+nnoremap <Leader>, <C-w><C-w>
+nnoremap <Leader>n :Files ~/notes<CR>
+nnoremap <Leader>s :split<CR>
+nnoremap <Leader>v :vsplit<CR>
+nnoremap <Leader>2 :split<CR>
+nnoremap <Leader>3 :vsplit<CR>
+nnoremap <Leader>q :q<CR>
+nnoremap <Leader>0 :q<CR>
+nnoremap <Leader>w :w<CR>
+nnoremap <Leader>f :Files<CR>
+nnoremap <Leader>b :Buffers<CR>
+nnoremap <Leader>h :History<CR>
+nnoremap <Leader>h :History<CR>
+
+" other leader keybinds "
+nnoremap <Leader>cw :colo wal<CR>
+nnoremap <Leader>cn :colo nighted<CR>
+nnoremap <Leader>pp :ProseMode<CR>
+nnoremap <Leader>ps :WrapMDHardToSoft<CR>
+
+" auto install vim-plug, if it's not there "
+if !has('nvim')
+    if empty(glob('~/.vim/autoload/plug.vim'))
+      silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+else
+    if empty(glob('~/.config/nvim/autoload/plug.vim'))
+      silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+endif
+
+" start adding plugins "
+call plug#begin('~/.vim/plugged')
+
+" linting "
+Plug 'w0rp/ale'
+
+" fzf integration "
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+
+" snippets "
+Plug 'SirVer/ultisnips'
+    Plug 'honza/vim-snippets'
+    let g:UltiSnipsExpandTrigger = '<tab>'
+    let g:UltiSnipsJumpForwardTrigger = '<tab>'
+    let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
+
+" autocomplete "
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
+
+" misc editing plugins "
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'dhruvasagar/vim-table-mode'
+Plug 'kana/vim-textobj-user'
+    Plug 'kana/vim-textobj-indent'
+Plug 'jiangmiao/auto-pairs'
+
+" language support "
+Plug 'sheerun/vim-polyglot'
+Plug 'jceb/vim-orgmode'
+Plug 'vim-pandoc/vim-pandoc'
+    Plug 'vim-pandoc/vim-pandoc-syntax'
+Plug 'lervag/vimtex'
+Plug 'neovimhaskell/haskell-vim'
+
+" visual plugins "
+Plug 'lilydjwg/colorizer'
+
+" writing plugins "
+Plug 'junegunn/goyo.vim'
+Plug 'junegunn/limelight.vim'
+
+" colour schemes "
+Plug 'wolf-dog/nighted.vim'
+Plug 'dylanaraps/wal.vim'
+
+call plug#end()
+
+" sets colour scheme "
+" this is based on my theme script: see bin/theme"
+if filereadable($HOME . '/.cache/colours/type') && match(readfile($HOME . '/.cache/colours/type'), 'default')!=-1
+    colo nighted
+else 
+    colo wal
+endif 
+
+" custom status bar - no plugins! i should maybe move this "
+" there's also another hi here that idk where to put "
+hi User1   ctermfg=7  ctermbg=1
+hi User2   ctermfg=0  ctermbg=6
+hi User3   ctermfg=0  ctermbg=2
+hi User4   ctermfg=7  ctermbg=4
+hi User5   ctermfg=15 ctermbg=0
+hi User6   ctermfg=0  ctermbg=15
+hi Conceal            ctermbg=NONE
+
+function! StatusLine() abort
+  let l:mode=mode()
+  let l:marker='\'
+  if l:mode == 'i'
+    let l:marker='%2* INSERT '
+  elseif l:mode ==# 'n'
+    let l:marker='%1* NORMAL '
+  elseif l:mode ==# ''
+    let l:marker='%4* VBLOCK '
+  elseif l:mode ==# 'V'
+    let l:marker='%4* V-LINE '
+  elseif l:mode ==# 'v'
+    let l:marker='%4* VISUAL '
+  elseif l:mode ==# 'R'
+    let l:marker='%3* RPLACE '
+  elseif l:mode ==# 'Rv'
+    let l:marker='%3* VRPLCE '
+  endif
+  let l:line=l:marker . '%5* %f '           " marker and path to file in buffer"
+  let l:line=l:line . '%m '              " modified flag "
+  let l:line=l:line . '%r '              " read only flag "
+  let l:line=l:line . '%h '              " help flag "
+  let l:line=l:line . '%w '              " preview window flag "
+  let l:line=l:line . '%='              " swap to right side "
+  let l:line=l:line . '%6* %{&ff} '          " file format "
+  let l:line=l:line . '%y '              " file type "
+  let l:line=l:line . '%l, '             " cursor line "
+  let l:line=l:line . '%v '              " cursor column "
+  return l:line
+endfunction
+
+set laststatus=2
+set statusline=%!StatusLine()

@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+# checks if the specified branch in the specified repo is up to date or not.
+# exit codes:
+#   0 - up to date
+#   1 - behind
+#   2 - ahead
+#   3 - diverged
+#   4 - any error
+
+# exit if wrong params
+if [[ $# -ne 4 ]]; then
+	echo Error: Incorrect parameters.
+	echo Usage: $0 [repo path] [branch name] [auto/noauto] [fetch/nofetch]
+	exit 4
+fi
+
+OPTAUTO=$3
+OPTFETCH=$4
+
+if git -C "$1" rev-parse --git-dir > /dev/null 2>&1; then
+	if git -C "$1" rev-parse --verify $2 > /dev/null 2>&1; then
+		echo " --- Checking branch $2..."
+
+		if ! git -C "$1" rev-parse "$2@{u}" > /dev/null; then
+			echo " --- Upstream for this branch not found."
+			echo " --- Enter an upstream for this branch (leave blank to skip this branch): "
+			read ORIGIN
+			if [ "$ORIGIN" = "" ]; then
+				echo " --- Skipping branch $2."
+				exit 1
+			fi
+            echo $ORIGIN
+			echo " -- Setting remote to $ORIGIN/$2."
+			git -C "$1" branch -u $ORIGIN/$2 $2
+		fi
+
+		UPSTREAMNAME=$(git -C "$1" rev-parse --abbrev-ref "$2@{upstream}")
+		BRANCHREMOTE=$(git -C "$1" config "branch.$2.remote")
+
+		if [ "$OPTFETCH" = "nofetch" ] || git -C "$1" fetch $BRANCHREMOTE $2 > /dev/null 2>&1; then
+			LOCAL=$(git -C "$1" rev-parse $2)
+			REMOTE=$(git -C "$1" rev-parse "$2@{upstream}")
+			BASE=$(git -C "$1" merge-base $2 "$2@{upstream}")
+
+			if [ $LOCAL = $REMOTE ]; then
+				echo " --- Local branch \"$2\" is up to date with $UPSTREAMNAME"
+				exit 0
+			elif [ $LOCAL = $BASE ]; then
+				if [ "$OPTAUTO" = "auto" ] || ask-yes-no  " --- Local branch \"$2\" is behind $UPSTREAMNAME. Pull from it? (y/n) "; then
+					git -C "$1" merge FETCH_HEAD
+				fi
+				exit 1
+			elif [ $REMOTE = $BASE ]; then
+				if [ "$OPTAUTO" = "auto" ] || ask-yes-no  " --- Local branch \"$2\" is ahead of $UPSTREAMNAME. Push to it? (y/n) "; then
+					git -C "$1" push $BRANCHREMOTE $2
+				fi
+				exit 2
+			else
+				echo " --- Local branch \"$2\" has diverged. You should fix it manually."
+				exit 3
+			fi
+		else
+			echo " --- Error: can't fetch the repo"
+			exit 4
+		fi
+	else
+		echo " --- Error: Branch $2 doesn't exist"
+		exit 4
+	fi
+else
+	echo " --- Error: This folder isn't a git repository"
+	exit 4
+fi

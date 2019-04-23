@@ -1,0 +1,23 @@
+#/usr/bin/env bash
+
+[ -f "/home/elliot/.cache/colours/sequences" ] && cat /home/elliot/.cache/colours/sequences
+
+if [ "$1" = "run" ]; then
+    i3-msg 'scratchpad show' > /dev/null
+    if [ "$2" = "single-command" ]; then
+        read -p "> " COMMAND
+        eval $COMMAND
+        echo "Press enter to quit."
+        read WHATEVER   #var isnt used for anything
+    elif [ "$2" = "fzf" ]; then
+        IFS=:;
+        find $PATH -maxdepth 1 -executable -type f,l -printf '%f\n' | \
+            /home/elliot/.fzf/bin/fzf --reverse --prompt="launch > " --color="16,info:0"\
+            > ~/.commandtemp
+        nohup $(cat ~/.commandtemp) >/dev/null & disown
+        i3-msg '[title="launcher"] move scratchpad' > /dev/null
+        exit
+    fi
+else
+    termite -t launcher -e "/home/elliot/bin/launcher run $1"; > /dev/null
+fi

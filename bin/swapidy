@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+if pgrep mopidy > /dev/null 2>&1; then
+    killall mopidy
+    mpd & disown > /dev/null 2>&1
+else
+    mpd --kill > /dev/null 2>&1
+    mopidy -q & disown > /dev/null 2>&1
+fi

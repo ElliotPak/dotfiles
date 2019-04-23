@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# env stuff
+if ! type pathadd > /dev/null 2>&1; then
+	. $HOME/.shell/env
+fi
+
+# drives
+mount_drives() {
+    while read DEVNAME LABEL; do
+        if ! [ -d "/media/$(whoami)/$LABEL" ]; then
+            sudo mkdir /media/$(whoami)/$LABEL
+            echo "Created directory \"/media/$(whoami)/$LABEL\" as it didn't exist."
+        fi
+        if ! [ $(ls -A /media/$(whoami)/$LABEL) ]; then
+            if ask-yes-no " --- Mount /dev/$DEVNAME to /media/$(whoami)/$LABEL? (y/n)"; then
+                sudo mount /dev/$DEVNAME /media/$(whoami)/$LABEL
+            fi
+        else
+            echo /dev/$DEVNAME is already mounted as /media/$(whoami)/$LABEL. > /dev/tty
+        fi
+    done
+}
+
+lsblk -o NAME,LABEL,MOUNTPOINT | grep -oP "sd\w\d\s*\w+\s*$" | mount_drives
+
+# git repos
+check-git-repo "https://gitlab.com/pakelli/dotfiles.git" "$HOME/dotfiles" noauto fetch
+check-git-repo "https://gitlab.com/pakelli/notes.git" "$HOME/notes" auto fetch
+check-git-repo "https://gitlab.com/pakelli/organisation.git" "$HOME/organisation" auto fetch
+
+# source per machine startup if it exists
+if [ -f "$HOME/.localstartup-fg" ]; then
+    echo "Running per-machine startup..."
+    source "$HOME/.localstartup-fg"
+fi
+
+echo Press enter to exit.
+read

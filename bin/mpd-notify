@@ -1,0 +1,60 @@
+#!/usr/bin/env sh
+
+PAUSED=""
+CURRENTTIME=""
+CURRENTSONG=""
+TOSEND=""
+TOFILE=false
+
+notify_current_song() {
+    THISSONGTITLE=$(mpc -p 6601 -f "%title%" current)
+    THISSONGARTIST=$(mpc -p 6601 -f "%artist%" current)
+    THISSONGALBUM=$(mpc -p 6601 -f "%album%" current)
+
+    TOSEND="$THISSONGARTIST - $THISSONGTITLE"
+    TOSENDFILE=$TOSEND
+    if [ "$THISSONGALBUM" != "" ]; then
+        TOSEND="$TOSEND\nAlbum: $THISSONGALBUM"
+    fi
+
+    if [ "$TOSEND" != "" ]; then
+        if [ "$TOFILE" = true ]; then
+            echo "Now Playing: $TOSENDFILE" > currentsong.txt
+        else
+            notify-send "Now Playing:" "$TOSEND"
+        fi
+    fi
+}
+
+if [ "$1" = "current" ]; then
+    if mpc -p 6601 status | grep "\[playing\]" > /dev/null; then
+        notify_current_song
+    else
+        notify-send "Nothing currently playing."
+    fi
+    exit 0
+elif [ "$1" = "file" ]; then
+    TOFILE=true
+fi
+
+while true; do
+    EVENTNAME=$(mpc -p 6601 idle)
+    if [ "$EVENTNAME" = "player" ]; then
+        STATUS=$(mpc -p 6601 status)
+        if echo $STATUS | grep "\[playing\]" > /dev/null; then
+            THISTIME=$(mpc -p 6601 | grep -Po "\d\:\d\d/\d\:\d\d")
+            THISSONG=$(mpc -p 6601 current)
+
+            if [ "$PAUSED" = "true" ] || [ "$CURRENTSONG" != "$THISSONG" ]; then
+                notify_current_song
+            fi
+
+            CURRENTTIME=$THISTIME
+            CURRENTSONG=$THISSONG
+            PAUSED=false
+        elif echo $STATUS | grep "\[paused\]" > /dev/null; then
+            PAUSED=true
+        fi
+    fi
+    TOSEND=""
+done

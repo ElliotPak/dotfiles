@@ -1,0 +1,30 @@
+# add argument 1 to $PATH if it's not already there
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$1"
+    fi
+}
+
+# add argument 1 to $CLASSPATH if it's not already there
+classpathadd() {
+    if [ -d "$1" ] && [[ ":$CLASSPATH:" != *":$1:"* ]]; then
+        CLASSPATH="${CLASSPATH:+"$CLASSPATH:"}$1"
+    fi
+}
+
+DOTFILES="$HOME/dotfiles"
+
+# path config
+pathadd "$HOME/bin"
+pathadd "$HOME/.local/bin"
+pathadd "$HOME/.cargo/bin"
+pathadd "$HOME/go/bin"
+
+classpathadd "/usr/share/java"
+
+# xdg config home
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# editor and visual
+export EDITOR="vim"
+export VISUAL="vim"

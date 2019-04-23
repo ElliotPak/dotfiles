@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+# setting up monitor specific things
+# including moving to workspaces and polybar stuff
+
+xrandr --output DP-1 --off --output DVI-D-1 --mode 1680x1050 --pos 3600x0 --rotate normal --output HDMI-1 --primary --mode 1920x1080 --pos 1680x0 --rotate normal
+
+# reset polybar
+killall polybar
+
+monitorcount=$(xrandr | grep -c " connected")
+if [ $monitorcount -eq 2 ]; then
+    xrandr --output HDMI-1 --primary
+    i3-msg "workspace 1; move workspace to HDMI-1"
+    i3-msg "workspace 2; move workspace to HDMI-1"
+    i3-msg "workspace 3; move workspace to HDMI-1"
+    i3-msg "workspace 4; move workspace to HDMI-1"
+    i3-msg "workspace 5; move workspace to HDMI-1"
+    i3-msg "workspace 6; move workspace to DVI-D-1; exec /usr/local/bin/termite"
+    i3-msg "workspace 7; move workspace to DVI-D-1; exec /usr/bin/firefox"
+    i3-msg "workspace 8; move workspace to DVI-D-1"
+    i3-msg "workspace 9; move workspace to DVI-D-1"
+    i3-msg "workspace 10; move workspace to DVI-D-1"
+    polybar main1 &
+    polybar main2 &
+    i3-msg "workspace 6"
+else
+    polybar main &
+fi

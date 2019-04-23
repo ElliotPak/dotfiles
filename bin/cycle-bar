@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+barcount=$(pgrep polybar | wc -l)
+monitorcount=$(xrandr | grep -c " connected")
+
+if [ $barcount -eq 0 ]; then
+    if [ $monitorcount -eq 2 ]; then
+        polybar main1 &
+        polybar main2 &
+    else
+        polybar main &
+    fi
+elif [ $barcount -eq $monitorcount ]; then
+    if [ $monitorcount -eq 2 ]; then
+        polybar extra1 &
+        polybar extra2 &
+    else
+        polybar extra &
+    fi
+else
+    killall polybar
+fi

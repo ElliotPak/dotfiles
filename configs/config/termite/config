@@ -1,0 +1,57 @@
+[options]
+allow_bold = true
+audible_bell = false
+clickable_url = true
+dynamic_title = true
+font = Iosevka Term SS06 13.5
+icon_name = terminal
+scroll_on_keystroke = true
+scrollback_lines = -1
+urgent_on_bell = true
+hyperlinks = true
+browser = firefox
+cursor_blink = on
+cursor_shape = block
+filter_unmatched_urls = true
+scrollbar = off
+
+[colors]
+# special
+foreground =        #eeeeee
+foreground_bold =   #eeeeee
+foreground_dim =    #eeeeee
+cursor =            #ffffff
+cursor_foreground = #222222
+background =        rgba(17, 17, 17, 0.85)
+
+# black
+color0  = #111111
+color8  = #222222
+
+# red
+color1  = #ff006f
+color9  = #ff75b1
+
+# green
+color2  = #00ffdf
+color10 = #88ffdf
+
+# yellow
+color3  = #ff00df
+color11 = #ff7ffe
+
+# blue
+color4  = #3563ff
+color12 = #86a1ff
+
+# magenta
+color5  = #9b00ff
+color13 = #cd81ff
+
+# cyan
+color6  = #00d7ff
+color14 = #88d7ff
+
+# white
+color7  = #dddddd
+color15 = #eeeeee
