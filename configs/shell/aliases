@@ -12,11 +12,11 @@ alias emacscg='emacsclient -c -a emacs &'
 alias st='source ~/bin/startup'
 alias stfg='source ~/bin/startup-fg'
 alias clipboard='xclip -selection clipboard'
-alias vlchere='find -type f -name "*.mp3" -exec vlc {} + &'
 alias pcsleep='i3lock && systemctl suspend'
-alias pcshutdown='! are-editors-running && shutdown now'
-alias pcreboot='! are-editors-running && shutdown -r now'
-alias i3logout='! are-editors-running && i3-msg exit'
+alias pcshutdown='shutdown-check && shutdown now'
+alias pcreboot='shutdown-check && shutdown -r now'
+alias i3logout='shutdown-check && i3-msg exit'
+alias yt='vlc-corner right'
 
 # used to start tmux sessions in specific folders
 # see .shell/func for a definition of tstart
@@ -51,7 +51,9 @@ alias gd="git diff"
 alias gdca="git diff --cached"
 alias gf="git fetch"
 alias gst="git status"
-alias gl="git log"
+alias gl="git log --color=always --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit | head"
+alias glg="git log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias glog="git log"
 alias grh="git reset HEAD"
 
 # tmux aliases

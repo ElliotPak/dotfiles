@@ -137,6 +137,7 @@ assign [class="^vlc$"] $ws10
 
 # Make certain windows floating
 for_window [class="^Gdebi\-gtk$"] floating enable
+for_window [class="^vlc$"] floating enable, sticky enable
 for_window [title="launcher"] floating enable, resize shrink height 100px, move position center, move scratchpad
 
 # various sizes of floating terminal windows

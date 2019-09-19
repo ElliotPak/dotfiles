@@ -9,8 +9,8 @@ fi
 theme resume
 
 # daemons
+set-blur 0
 nm-applet & disown
-compton -b & disown
 emacs --daemon & disown
 mpd & disown
 dunst & disown

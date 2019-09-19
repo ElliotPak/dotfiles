@@ -47,12 +47,18 @@ elif [ "$COMMAND" = "volume" ]; then
     OUTPUT="$(awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master))"
 
 elif [ "$COMMAND" = "nowplaying" ]; then
+    OUTPUT="$(mpc -p 6601 -f '"%title%" by %artist%' current)"
+    if [ "$OUTPUT" = "\"\" by " ]; then
+        # just use basename for music with no metadata
+        OUTPUT_MID=$(mpc -p 6601 -f '%file%' current)
+        OUTPUT=$(basename "$OUTPUT_MID")
+    fi
     if mpc -p 6601 2> /dev/null | grep playing > /dev/null 2>&1; then
         GLYPH=""
-        OUTPUT="$(mpc -p 6601 -f '"%title%" by %artist%' current)"
     elif mpc -p 6601 2> /dev/null | grep paused > /dev/null 2>&1; then
         GLYPH=""
-        OUTPUT="$(mpc -p 6601 -f '"%title%" by %artist%' current)"
+    else
+        OUTPUT=""
     fi
 
 elif [ "$COMMAND" = "battery" ]; then

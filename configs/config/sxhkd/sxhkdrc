@@ -83,3 +83,7 @@ super + shift + w
 # change between wallpaper/scheme modes
 super + ctrl + w
     theme swap
+
+# put window in bottom right corner
+super + {apostrophe,semicolon}
+    sticky-corner {right,left}

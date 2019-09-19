@@ -55,6 +55,8 @@ You can manually change this within the i3 configuration file.
 | *Super + Shift + i*        | Display system info as a notification (using `bin/sys-info`)             |
 | *Super + Shift + w*        | Swap to a random wallpaper/colourscheme (using `bin/theme`)              |
 | *Super + Ctrl + w*         | Swap between colourschemes for the current wallpaper (using `bin/theme`) |
+| *Super + '*                | Stick window in bottom right corner                                      |
+| *Super + ;*                | Stick window in bottom left corner                                       |
 | *Super + plus*             | Increase volume                                                          |
 | *Super + minus*            | Decrease volume                                                          |
 | *Super + p*                | Toggle music (running via mpd) between play and pause                    |

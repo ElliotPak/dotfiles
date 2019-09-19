@@ -11,11 +11,15 @@ notify_current_song() {
     THISSONGARTIST=$(mpc -p 6601 -f "%artist%" current)
     THISSONGALBUM=$(mpc -p 6601 -f "%album%" current)
 
-    TOSEND="$THISSONGARTIST - $THISSONGTITLE"
-    TOSENDFILE=$TOSEND
-    if [ "$THISSONGALBUM" != "" ]; then
-        TOSEND="$TOSEND\nAlbum: $THISSONGALBUM"
+    if [ "$THISSONGTITLE" = "" ] && [ "$THISSONGARTIST" = "" ]; then
+        TOSEND=$(mpc -p 6601 -f "%file%" current)
+    else
+        TOSEND="$THISSONGARTIST - $THISSONGTITLE"
+        if [ "$THISSONGALBUM" != "" ]; then
+            TOSEND="$TOSEND\nAlbum: $THISSONGALBUM"
+        fi
     fi
+    TOSENDFILE=$TOSEND
 
     if [ "$TOSEND" != "" ]; then
         if [ "$TOFILE" = true ]; then

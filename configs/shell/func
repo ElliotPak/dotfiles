@@ -126,15 +126,18 @@ process-runs-in() {
 # will also handle certain things on shutdown, like pushing unpushed changes
 # to gitrepos
 shutdown-check() {
-	shuttingDown="no"
-    if process-runs-in vim; then shuttingDown="yes"; fi
-    if process-runs-in "emacsclient"; then shuttingDown="yes"; fi
-    if [ "$shuttingDown" != "yes" ]; then
-        echo yay
+    results="$(process-runs-in vim)"
+    results="$(process-runs-in nvim)"
+    results="$results\n$(process-runs-in emacsclient)"
+    if [ "$results" != "\n" ]; then
+        echo $results
         return 1
     else
+        check-git-repo "https://gitlab.com/pakelli/dotfiles.git" "$HOME/dotfiles" auto nofetch
         check-git-repo "https://gitlab.com/pakelli/notes.git" "$HOME/notes" auto nofetch
         check-git-repo "https://gitlab.com/pakelli/organisation.git" "$HOME/organisation" auto nofetch
+        echo Press enter to continue.
+        read
         return 0
     fi
 }
@@ -220,4 +223,12 @@ tstart() {
 #      foldersize 2 works for their subdirectories, etc
 foldersize() {
     find -maxdepth $1 -mindepth $1 -type d | sed 's/^/"/g' | sed 's/$/"/g' | xargs -n 1 du -sh | sort -h
+}
+
+# plays a file via vlc in a bottom corner
+vlc-corner() {
+    vlc $2 > /dev/null 2>&1 & disown
+    xdotool search --sync --class "^vlc$"
+    i3-msg '[class="^vlc$"] focus'
+    sticky-corner $1
 }

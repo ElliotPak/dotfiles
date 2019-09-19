@@ -1,12 +1,16 @@
 shellname=$(ps -p$$ -ocmd=)
 
-__prompt_errorcode() {
+# error prompt
+__err() {
     if [ $? -ne 0 ]; then
-        echo "[!] "
+        echo "$1"
+    else
+        echo "$2"
     fi
 }
 
-__c() {
+# change foreground colour
+__fg() {
     colour=""
     if [[ $1 -ge 0 ]] && [[ $1 -lt 8 ]]; then
         colour=$(( 30 + $1 ))
@@ -14,7 +18,30 @@ __c() {
         colour=$(( $1 - 8))
         colour=$(( $colour + 90 ))
     fi
-    echo -e "\e[${colour}m"
+    echo -n -e "\e[${colour}m"
+}
+
+# change background colour
+__bg() {
+    colour=""
+    if [[ $1 -ge 0 ]] && [[ $1 -lt 8 ]]; then
+        colour=$(( 40 + $1 ))
+    elif [[ $1 -ge 8 ]] && [[ $1 -lt 16 ]]; then
+        colour=$(( $1 - 8))
+        colour=$(( $colour + 100 ))
+    fi
+    echo -n -e "\e[${colour}m"
+}
+
+# change both colours
+__c() {
+    __fg "$1"
+    __bg "$2"
+}
+
+# reset colours
+__r() {
+    echo -n -e "\e[0m"
 }
 
 if [ ! -f $HOME/.git-prompt.sh ]; then
@@ -23,22 +50,56 @@ if [ ! -f $HOME/.git-prompt.sh ]; then
 fi
 source ~/.git-prompt.sh
 
-if [[ "$shellname" =~ .*zsh ]]; then
-    setopt PROMPT_SUBST
-    export PS1=$'\n┌─── $(__prompt_errorcode "%s")%{$(__c 6 "%s")%}[%~]%{$(__c 13 "%s")%}$(__git_ps1 " (%s)") %{$(__c 1 "%s")%}[%n@%m]\n%{$(__c 7 "%s")%}└─> '
-elif [[ "$shellname" =~ .*bash ]]; then
-    export PS1="\n$(__prompt_errorcode)$(__c 1) {\w}$(__c 13)$(__git_ps1) $(__c 6){\u@\h}\n$(__c 7)$ "
+# prompt with just lambdas
+__prompt_minimal() {
+    if [[ "$shellname" =~ .*zsh ]]; then
+        setopt PROMPT_SUBST
+        export PS1=$' $(__err "!" "λ" "%s") '
+        export RPROMPT=$'%{$(__fg 6 "%s")%}[%~]%{$(__fg 13 "%s")%}$(__git_ps1 " (%s)") %{$(__fg 1 "%s")%}[%n@%m]%{$(__r "%s")%}'
+    elif [[ "$shellname" =~ .*bash ]]; then
+        export PS1=" $(__err "!" "λ") "
+    fi
+}
+
+# prompt with coloured blocks
+# doesn't quite work yet
+__prompt_blocks() {
+    if [[ "$shellname" =~ .*zsh ]]; then
+        setopt PROMPT_SUBST
+        export PS1=$'\n%{$(__c 0 7 "%s")%}epic %{$(__err " ! " "" "%s")%}%{$(__c 0 6 "%s")%} %~ %{$(__bg 13 "%s")%} $(__git_ps1 "(%s)") %{$(__bg 1 "%s")%} %n@%m \n%{$(__r "%s")%} λ '
+    elif [[ "$shellname" =~ .*bash ]]; then
+        export PS1="\n$(__err " ! " "")$(__fg 1) {\w}$(__fg 13)$(__git_ps1) $(__fg 6){\u@\h}\n$(__fg 7)$ "
+    fi
+}
+
+# my old prompt
+__prompt_brackets() {
+    if [[ "$shellname" =~ .*zsh ]]; then
+        setopt PROMPT_SUBST
+        export PS1=$'\n┌─── $(__err "[!] " "" "%s")%{$(__fg 6 "%s")%}[%~]%{$(__fg 13 "%s")%}$(__git_ps1 " (%s)") %{$(__fg 1 "%s")%}[%n@%m]\n%{$(__fg 7 "%s")%}└─> '
+    elif [[ "$shellname" =~ .*bash ]]; then
+        export PS1="\n$(__err "[!] " "")$(__fg 1) {\w}$(__fg 13)$(__git_ps1) $(__fg 6){\u@\h}\n$(__fg 7)$ "
+    fi
+}
+
+if [ "$PROMPTSTYLE" = "minimal" ]; then
+    __prompt_minimal
+elif [ "$PROMPTSTYLE" = "blocks" ]; then
+    __prompt_blocks
+elif [ "$PROMPTSTYLE" = "brackets" ]; then
+    __prompt_brackets
 fi
 
 # Startup message
 echo ""
-echo "    $(__c 1)Shell: $(__c 9)$shellname"
-echo "    $(__c 2)Kernel: $(__c 10)$(uname -r)"
-echo "    $(__c 3)User: $(__c 11)$USER"
+echo "    $(__fg 1)Shell: $(__fg 9)$shellname"
+echo "    $(__fg 2)Kernel: $(__fg 10)$(uname -r)"
+echo "    $(__fg 3)User: $(__fg 11)$USER"
 if [[ "$shellname" =~ .*zsh ]]; then
-    echo "    $(__c 4)Hostname: $(__c 12)$HOST"
+    echo "    $(__fg 4)Hostname: $(__fg 12)$HOST"
 elif [[ "$shellname" =~ .*bash ]]; then
-    echo "    $(__c 4)Hostname: $(__c 12)$HOSTNAME"
+    echo "    $(__fg 4)Hostname: $(__fg 12)$HOSTNAME"
 fi
-echo "    $(__c 5)Uptime: $(__c 13)$(uptime -p)"
-echo "    $(__c 6)Date: $(__c 14)$(date +"%H.%M %d.%m.%Y")"
+echo "    $(__fg 5)Uptime: $(__fg 13)$(uptime -p)"
+echo "    $(__fg 6)Date: $(__fg 14)$(date +"%H.%M %d.%m.%Y")"
+echo ""

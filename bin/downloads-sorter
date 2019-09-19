@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+make_folder_and_move() {
+    OIFS="$IFS"
+    IFS=$'\n'
+    FOLDER=$1
+    EXT=$2
+    if ! [ -d "$FOLDER" ]; then
+        mkdir -p $FOLDER
+    fi
+    for file in *.$EXT; do
+        mv $file $FOLDER
+    done 2> /dev/null
+    IFS="$OIFS"
+}
+
+if [ "$#" -eq "2" ]; then
+    make_folder_and_move $1 $2
+    exit $?
+fi
+
+make_folder_and_move pdfs pdf
+make_folder_and_move archives zip
+make_folder_and_move archives tar.gz
+make_folder_and_move packages deb
+make_folder_and_move images jpg
+make_folder_and_move images jpeg
+make_folder_and_move images png
+make_folder_and_move audio m4a
+make_folder_and_move audio mp3
+make_folder_and_move video mp4
+make_folder_and_move documents doc
+make_folder_and_move documents docx
+make_folder_and_move documents md
+make_folder_and_move documents txt
+make_folder_and_move web html
+make_folder_and_move code py
+make_folder_and_move executable jar
+make_folder_and_move executable exe
+make_folder_and_move slideshow ppt
+make_folder_and_move slideshow pptx

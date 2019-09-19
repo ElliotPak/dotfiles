@@ -77,6 +77,7 @@ nnoremap <Leader>3 :vsplit<CR>
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>0 :q<CR>
 nnoremap <Leader>w :w<CR>
+nnoremap <Leader>F :Files ..<CR>
 nnoremap <Leader>f :Files<CR>
 nnoremap <Leader>b :Buffers<CR>
 nnoremap <Leader>h :History<CR>
@@ -113,6 +114,9 @@ Plug 'w0rp/ale'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
 
+" coc.nvim "
+Plug 'neoclide/coc.nvim'
+
 " snippets "
 Plug 'SirVer/ultisnips'
     Plug 'honza/vim-snippets'
@@ -120,15 +124,15 @@ Plug 'SirVer/ultisnips'
     let g:UltiSnipsJumpForwardTrigger = '<tab>'
     let g:UltiSnipsJumpBackwardTrigger = '<s-tab>'
 
-" autocomplete "
-if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-    Plug 'Shougo/deoplete.nvim'
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
-let g:deoplete#enable_at_startup = 1
+" autocomplete (disabled while i try out coc.nvim) "
+" if has('nvim')
+"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+" else
+"     Plug 'Shougo/deoplete.nvim'
+"     Plug 'roxma/nvim-yarp'
+"     Plug 'roxma/vim-hug-neovim-rpc'
+" endif
+" let g:deoplete#enable_at_startup = 1
 
 " misc editing plugins "
 Plug 'tpope/vim-repeat'
@@ -139,13 +143,17 @@ Plug 'kana/vim-textobj-user'
     Plug 'kana/vim-textobj-indent'
 Plug 'jiangmiao/auto-pairs'
 
-" language support "
+" markup/misc language support "
 Plug 'sheerun/vim-polyglot'
 Plug 'jceb/vim-orgmode'
 Plug 'vim-pandoc/vim-pandoc'
     Plug 'vim-pandoc/vim-pandoc-syntax'
 Plug 'lervag/vimtex'
+
+" haskell support "
 Plug 'neovimhaskell/haskell-vim'
+Plug 'alx741/vim-hindent'
+Plug 'mpickering/hlint-refactor-vim'
 
 " visual plugins "
 Plug 'lilydjwg/colorizer'

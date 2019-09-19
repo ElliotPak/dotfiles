@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [ $1 = '0' ]; then
+    killall compton; compton > /dev/null 2>&1 & disown
+else
+    killall compton; compton --blur-background --blur-strength=$1 > /dev/null 2>&1 & disown
+fi

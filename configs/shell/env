@@ -22,6 +22,9 @@ pathadd "$HOME/go/bin"
 
 classpathadd "/usr/share/java"
 
+# theming stuff
+export PROMPTSTYLE="minimal"
+
 # xdg config home
 export XDG_CONFIG_HOME="$HOME/.config"
 
